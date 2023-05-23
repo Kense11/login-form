@@ -3,12 +3,19 @@ import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
 import { useLoginUserMutation } from '~/mutations/loginUserMutation'
+import type { Props as TheInputProps } from '~/components/TheInput.vue'
+
+const staticInputsData: Array<TheInputProps> = [
+  { name: 'email', type: 'email', label: 'Email', placeholder: 'Your email address', autocomplete: 'email', successMessage: 'Got it, we won\'t spam you!' },
+  { name: 'password', type: 'password', label: 'Password', placeholder: 'Your password', autocomplete: 'off', successMessage: 'Nice and secure!' },
+  { name: 'confirmPassword', type: 'password', label: 'Confirm password', placeholder: 'Type it again', autocomplete: 'off', successMessage: 'Glad you remembered it!' },
+]
 
 const validationSchema = toTypedSchema(
   zod.object({
-    email: zod.string().nonempty('This is required').email({ message: 'Must be a valid email' }),
-    password: zod.string().nonempty('This is required').min(5, { message: 'Too short' }),
-    confirmPassword: zod.string().nonempty('This is required'),
+    email: zod.string().nonempty('Email is required').email({ message: 'Must be a valid email' }),
+    password: zod.string().nonempty('Password is required').min(32, { message: 'Password is too short' }),
+    confirmPassword: zod.string().nonempty('Password confirmation is required'),
   }).refine(data => data.password === data.confirmPassword, {
     message: 'Passwords don\'t match',
     path: ['confirmPassword'],
@@ -41,29 +48,23 @@ const onSubmit = handleSubmit(async ({ email, password }) => {
 
 <template>
   <div>
-    <div i-carbon-campsite inline-block text-4xl />
-    <p>
-      <a rel="noreferrer" href="https://github.com/antfu/vitesse-lite" target="_blank">
-        Vitesse Lite
-      </a>
-    </p>
-    <p>
-      <em text-sm op75>Opinionated Vite Starter Template</em>
-    </p>
+    <div flex="~ 1 col" justify-center p="x-6 y-12 lg:x-8">
+      <div sm="mx-auto max-w-sm w-full">
+        <div i-carbon-campsite inline-block text-4xl />
 
-    <div py-4 />
+        <h2 mt-10 text="cetner 2xl" font-bold leading-9 tracking-tight>
+          Sign in to your account
+        </h2>
 
-    <form @submit="onSubmit">
-      <TheInput name="email" type="email" label="E - mail" placeholder="Your email address" autocomplete="true" />
+        <form mt-10 text-start space-y-6 @submit="onSubmit">
+          <TheInput v-for="item in staticInputsData" :key="item.name" v-bind="item" />
 
-      <TheInput name="password" type="password" label="Password" placeholder="Your password" />
-
-      <TheInput name="confirmPassword" type="password" label="Confirm password" placeholder="Type it again" />
-
-      <button :disabled="isSubmitting" class="m-3 text-sm btn">
-        Submit
-      </button>
-    </form>
+          <button :disabled="isSubmitting" w-full text-lg btn>
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 

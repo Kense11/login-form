@@ -1,1 +1,1 @@
-export const correctMockPassword = 'password123'
+export const correctMockPassword = 'RwXTmxdvmNgmveCFNTiXmXydGxYsw2BV'

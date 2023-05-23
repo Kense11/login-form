@@ -16,13 +16,15 @@ function logout() {
     <div i-carbon-campsite inline-block text-4xl />
 
     <div py-4 />
-    Hi, {{ fullName }}! Welcome to the app!
-    <div />
+
+    <p>
+      Hi, {{ fullName }}! Welcome to the app!
+    </p>
 
     <button
       m-3 mt-8 text-sm btn @click="logout"
     >
-      Log out
+      Sign out
     </button>
   </div>
 </template>
