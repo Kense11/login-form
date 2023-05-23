@@ -12,9 +12,13 @@
     "postinstall": "npx simple-git-hooks"
   },
   "dependencies": {
+    "@tanstack/vue-query": "^4.29.7",
+    "@vee-validate/zod": "^4.9.5",
     "@vueuse/core": "^10.1.2",
+    "vee-validate": "^4.9.5",
     "vue": "^3.3.2",
-    "vue-router": "^4.2.0"
+    "vue-router": "^4.2.0",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.38.6",

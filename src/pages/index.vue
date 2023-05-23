@@ -1,15 +1,42 @@
-<script setup lang="ts" generic="T extends any, O extends any">
-defineOptions({
-  name: 'IndexPage',
+<script setup lang="ts">
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
+import * as zod from 'zod'
+import { useLoginUserMutation } from '~/mutations/loginUserMutation'
+
+const validationSchema = toTypedSchema(
+  zod.object({
+    email: zod.string().nonempty('This is required').email({ message: 'Must be a valid email' }),
+    password: zod.string().nonempty('This is required').min(5, { message: 'Too short' }),
+    confirmPassword: zod.string().nonempty('This is required'),
+  }).refine(data => data.password === data.confirmPassword, {
+    message: 'Passwords don\'t match',
+    path: ['confirmPassword'],
+  }),
+)
+
+const { handleSubmit, isSubmitting, setFieldError } = useForm({
+  validationSchema,
 })
 
-const name = ref('')
-
 const router = useRouter()
-function go() {
-  if (name.value)
-    router.push(`/hi/${encodeURIComponent(name.value)}`)
-}
+
+const loginUserMutation = useLoginUserMutation()
+
+const { user } = useUser()
+
+const onSubmit = handleSubmit(async ({ email, password }) => {
+  try {
+    user.value = await loginUserMutation.mutateAsync({ email, password })
+
+    router.push({
+      name: 'welcome',
+    })
+  }
+  catch (error) {
+    setFieldError('password', error as string)
+  }
+})
 </script>
 
 <template>
@@ -26,21 +53,22 @@ function go() {
 
     <div py-4 />
 
-    <TheInput
-      v-model="name"
-      placeholder="What's your name?"
-      autocomplete="false"
-      @keydown.enter="go"
-    />
+    <form @submit="onSubmit">
+      <TheInput name="email" type="email" label="E - mail" placeholder="Your email address" autocomplete="true" />
 
-    <div>
-      <button
-        class="m-3 text-sm btn"
-        :disabled="!name"
-        @click="go"
-      >
-        Go
+      <TheInput name="password" type="password" label="Password" placeholder="Your password" />
+
+      <TheInput name="confirmPassword" type="password" label="Confirm password" placeholder="Type it again" />
+
+      <button :disabled="isSubmitting" class="m-3 text-sm btn">
+        Submit
       </button>
-    </div>
+    </form>
   </div>
 </template>
+
+<route>
+  {
+    name: "login",
+  }
+</route>
